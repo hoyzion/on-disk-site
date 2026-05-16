@@ -7,21 +7,50 @@ const InstagramIcon = () => (
 );
 
 function App() {
-  // Controle da Tela de Entrada (Splash Screen)
   const [splashStep, setSplashStep] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Estados para controlar o horário de funcionamento
+  const [machadoOpen, setMachadoOpen] = useState(false);
+  const [pocosOpen, setPocosOpen] = useState(false);
+
   useEffect(() => {
-    // Sequência de animação da tela inicial
+    // Sequência da tela inicial
     const timers = [
-      setTimeout(() => setSplashStep(1), 1800), // Passo 1: Mostra a Frase
-      setTimeout(() => setSplashStep(2), 4000), // Passo 2: Mostra a Logo Escrita
-      setTimeout(() => {
-        setIsLoaded(true); // Passo 3: Libera o site
-      }, 5500) 
+      setTimeout(() => setSplashStep(1), 1800),
+      setTimeout(() => setSplashStep(2), 4000),
+      setTimeout(() => setIsLoaded(true), 5500) 
     ];
-    return () => timers.forEach(clearTimeout);
+
+    // LÓGICA DE HORÁRIO DE FUNCIONAMENTO
+    const checkStatus = () => {
+      const currentHour = new Date().getHours();
+      
+      // Machado: 08h às 03h
+      if (currentHour >= 8 || currentHour < 3) {
+        setMachadoOpen(true);
+      } else {
+        setMachadoOpen(false);
+      }
+
+      // Poços: 14h às 03h
+      if (currentHour >= 14 || currentHour < 3) {
+        setPocosOpen(true);
+      } else {
+        setPocosOpen(false);
+      }
+    };
+
+    checkStatus();
+    const interval = setInterval(checkStatus, 60000);
+
+    return () => {
+      timers.forEach(clearTimeout);
+      clearInterval(interval);
+    };
   }, []);
+
+  const anyOpen = machadoOpen || pocosOpen;
 
   const drinks = [
     { id: 1, img: '/roxo.png', label: 'Pitaya Premium', desc: 'Frutas Vermelhas & Pitaya Silvestre' },
@@ -30,37 +59,29 @@ function App() {
     { id: 4, img: '/todos.png', label: 'Combo Experience', desc: 'A Noite Completa On Disk' },
   ];
 
-  // Texto das faixas
   const marqueeText = " • ON DISK DRINKS • A BEBIDA QUE VOCÊ RESPEITA • ENTREGA RÁPIDA • EXPERIÊNCIA PREMIUM";
   const fullMarquee = marqueeText.repeat(8);
 
   return (
     <div className="min-h-screen bg-transparent text-white relative selection:bg-[#39ff14] selection:text-black">
       
-      {/* TELA DE SPLASH SEQUENCIAL (CARREGAMENTO) */}
+      {/* TELA DE SPLASH (CARREGAMENTO) */}
       <div className={`fixed inset-0 z-[999] bg-[#020202] flex items-center justify-center transition-all duration-1000 ease-in-out ${isLoaded ? 'opacity-0 pointer-events-none scale-110' : 'opacity-100 scale-100'}`}>
-        
-        {/* Passo 0: Apenas a Logo Símbolo */}
         <div className={`absolute transition-all duration-700 transform ${splashStep === 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'}`}>
           <div className="relative">
             <div className="absolute inset-0 bg-[#39ff14] blur-[50px] opacity-20 animate-pulse rounded-full"></div>
             <img src="/logo on disk.png" alt="Símbolo On Disk" className="w-32 md:w-48 relative z-10 drop-shadow-[0_0_30px_#39ff14] animate-bounce" />
           </div>
         </div>
-
-        {/* Passo 1: A Frase de Impacto */}
         <div className={`absolute px-6 text-center transition-all duration-700 transform ${splashStep === 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-110 pointer-events-none'}`}>
           <h2 className="text-2xl md:text-5xl font-black uppercase tracking-tight leading-snug">
             As melhores bebidas <br/>
             <span className="text-neon text-[#39ff14]">você encontra aqui.</span>
           </h2>
         </div>
-
-        {/* Passo 2: A Logo Escrita */}
         <div className={`absolute transition-all duration-700 transform ${splashStep >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'}`}>
           <img src="/logo com nome.png" alt="On Disk Nome" className="h-10 md:h-16 drop-shadow-[0_0_20px_rgba(57,255,20,0.6)] animate-pulse" />
         </div>
-
       </div>
 
       {/* FUNDO GLOBAL ANIMADO */}
@@ -86,10 +107,19 @@ function App() {
       {/* TELA INICIAL (HERO) */}
       <header className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-24 flex flex-col lg:flex-row items-center justify-between gap-12">
         <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#39ff14]/10 border border-[#39ff14]/30 mb-6">
-            <span className="w-2 h-2 rounded-full bg-[#39ff14] animate-pulse"></span>
-            <span className="text-[#39ff14] text-[10px] sm:text-xs font-bold uppercase tracking-widest">Aberto Agora</span>
-          </div>
+          
+          {/* SELO DE HORÁRIO DINÂMICO */}
+          {anyOpen ? (
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#39ff14]/10 border border-[#39ff14]/30 mb-6">
+              <span className="w-2 h-2 rounded-full bg-[#39ff14] animate-pulse"></span>
+              <span className="text-[#39ff14] text-[10px] sm:text-xs font-bold uppercase tracking-widest">Aberto Agora</span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 mb-6">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+              <span className="text-red-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest">Fechado no Momento</span>
+            </div>
+          )}
           
           <img 
             src="/logo on disk.png" 
@@ -126,17 +156,14 @@ function App() {
         </div>
       </header>
 
-      {/* DUAS FAIXAS INFINITAS CRUZADAS (ESTILO GR6) */}
+      {/* FAIXAS INFINITAS CRUZADAS */}
       <div className="relative z-20 flex flex-col items-center justify-center h-48 sm:h-64 overflow-hidden w-full my-8">
-        {/* Faixa 1 (Verde) - Inclinada para baixo */}
         <div className="absolute w-[120%] bg-[#39ff14] py-3 shadow-[0_0_30px_rgba(57,255,20,0.4)] border-y border-black z-10 -rotate-2">
           <div className="animate-marquee whitespace-nowrap flex items-center">
             <span className="text-black font-black text-xl sm:text-2xl uppercase tracking-widest">{fullMarquee}</span>
             <span className="text-black font-black text-xl sm:text-2xl uppercase tracking-widest">{fullMarquee}</span>
           </div>
         </div>
-        
-        {/* Faixa 2 (Preta) - Inclinada para cima (Cruza por baixo) */}
         <div className="absolute w-[120%] bg-[#050505] py-3 shadow-[0_0_30px_rgba(57,255,20,0.1)] border-y border-[#39ff14] z-0 rotate-2">
           <div className="animate-marquee-reverse whitespace-nowrap flex items-center">
             <span className="text-[#39ff14] font-black text-xl sm:text-2xl uppercase tracking-widest">{fullMarquee}</span>
@@ -161,20 +188,13 @@ function App() {
               className="group glass-effect rounded-[2rem] p-6 flex flex-col justify-between cursor-pointer transition-all duration-500 overflow-hidden relative"
             >
               <div className="absolute inset-0 bg-gradient-to-t from-[#39ff14]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
               <div className="h-64 sm:h-72 flex items-center justify-center relative z-10">
-                <img 
-                  src={drink.img} 
-                  alt={drink.label} 
-                  className="max-h-full max-w-full object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.6)] group-hover:scale-110 group-hover:-translate-y-4 transition-transform duration-500" 
-                />
+                <img src={drink.img} alt={drink.label} className="max-h-full max-w-full object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.6)] group-hover:scale-110 group-hover:-translate-y-4 transition-transform duration-500" />
               </div>
-
               <div className="mt-6 text-center relative z-10">
                 <h4 className="text-xl font-bold tracking-wide text-white group-hover:text-[#39ff14] transition-colors uppercase">{drink.label}</h4>
                 <p className="text-xs text-zinc-400 mt-2 font-light">{drink.desc}</p>
               </div>
-
               <div className="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-6 text-center z-20">
                 <h3 className="text-[#39ff14] text-2xl font-black tracking-tight text-neon mb-2 uppercase">FICOU COM VONTADE?</h3>
                 <p className="text-zinc-300 text-sm font-light mb-6">Bebida única, só encontra com a gente!</p>
@@ -198,25 +218,14 @@ function App() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <a 
-              href="https://www.instagram.com/ondisk_machado/" 
-              target="_blank" 
-              rel="noreferrer"
-              className="group flex items-center justify-center gap-4 bg-zinc-900/40 border border-zinc-800 p-8 rounded-[2rem] hover:bg-[#39ff14]/10 hover:border-[#39ff14]/50 transition-all duration-300 backdrop-blur-md"
-            >
+            <a href="https://www.instagram.com/ondisk_machado/" target="_blank" rel="noreferrer" className="group flex items-center justify-center gap-4 bg-zinc-900/40 border border-zinc-800 p-8 rounded-[2rem] hover:bg-[#39ff14]/10 hover:border-[#39ff14]/50 transition-all duration-300 backdrop-blur-md">
               <InstagramIcon />
               <div className="text-left">
                 <p className="text-zinc-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 group-hover:text-zinc-300 transition-colors">Siga a Matriz</p>
                 <span className="text-lg sm:text-xl font-black uppercase text-white group-hover:text-[#39ff14] transition-colors">@ondisk_machado</span>
               </div>
             </a>
-
-            <a 
-              href="https://www.instagram.com/ondisk_pocosdecaldas/" 
-              target="_blank" 
-              rel="noreferrer"
-              className="group flex items-center justify-center gap-4 bg-zinc-900/40 border border-zinc-800 p-8 rounded-[2rem] hover:bg-[#39ff14]/10 hover:border-[#39ff14]/50 transition-all duration-300 backdrop-blur-md"
-            >
+            <a href="https://www.instagram.com/ondisk_pocosdecaldas/" target="_blank" rel="noreferrer" className="group flex items-center justify-center gap-4 bg-zinc-900/40 border border-zinc-800 p-8 rounded-[2rem] hover:bg-[#39ff14]/10 hover:border-[#39ff14]/50 transition-all duration-300 backdrop-blur-md">
               <InstagramIcon />
               <div className="text-left">
                 <p className="text-zinc-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 group-hover:text-zinc-300 transition-colors">Siga a Filial</p>
@@ -238,11 +247,20 @@ function App() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="glass-effect rounded-3xl p-6 sm:p-10 flex flex-col justify-between relative overflow-hidden group">
+            
+            {/* CARD MACHADO */}
+            <div className={`glass-effect rounded-3xl p-6 sm:p-10 flex flex-col justify-between relative overflow-hidden group ${machadoOpen ? 'border-[#39ff14]/30' : 'border-zinc-800'}`}>
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#39ff14]/10 rounded-bl-full pointer-events-none group-hover:scale-150 transition-transform duration-700"></div>
               <div>
                 <div className="flex flex-wrap justify-between items-center gap-2 mb-8">
-                  <span className="bg-[#39ff14]/20 text-[#39ff14] px-3 py-1 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-widest">Matriz</span>
+                  <div className="flex gap-2">
+                    <span className="bg-[#39ff14]/20 text-[#39ff14] px-3 py-1 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-widest">Matriz</span>
+                    {machadoOpen ? (
+                      <span className="bg-[#39ff14]/20 text-[#39ff14] px-3 py-1 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-widest">🟢 Aberto</span>
+                    ) : (
+                      <span className="bg-red-500/20 text-red-500 px-3 py-1 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-widest">🔴 Fechado</span>
+                    )}
+                  </div>
                   <span className="text-zinc-500 text-[10px] sm:text-xs font-mono">CNPJ: 56.981.861/0001-52</span>
                 </div>
                 <h3 className="text-2xl sm:text-3xl font-black uppercase mb-6 text-white group-hover:text-[#39ff14] transition-colors">On Disk Machado</h3>
@@ -255,18 +273,30 @@ function App() {
                     <span className="text-[#39ff14] text-lg">📱</span>
                     <span>(35) 99770-9086</span>
                   </p>
+                  <p className="text-zinc-500 text-xs flex items-center gap-3">
+                    <span className="text-zinc-600 text-lg">🕒</span>
+                    <span>Aberto todos os dias das 08:00 às 03:00</span>
+                  </p>
                 </div>
               </div>
               <a href="https://wa.me/5535997709086" target="_blank" rel="noreferrer" className="w-full text-center bg-[#39ff14] text-black font-black px-4 py-4 rounded-xl text-xs sm:text-sm tracking-widest uppercase hover:bg-white transition-all shadow-[0_0_20px_rgba(57,255,20,0.2)]">
-                Pedir em Machado
+                Pedir no WhatsApp
               </a>
             </div>
 
-            <div className="glass-effect rounded-3xl p-6 sm:p-10 flex flex-col justify-between relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full pointer-events-none group-hover:scale-150 transition-transform duration-700"></div>
+            {/* CARD POÇOS DE CALDAS */}
+            <div className={`glass-effect rounded-3xl p-6 sm:p-10 flex flex-col justify-between relative overflow-hidden group ${pocosOpen ? 'border-[#39ff14]/30' : 'border-zinc-800'}`}>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#39ff14]/10 rounded-bl-full pointer-events-none group-hover:scale-150 transition-transform duration-700"></div>
               <div>
                 <div className="flex flex-wrap justify-between items-center gap-2 mb-8">
-                  <span className="bg-white/10 text-white px-3 py-1 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-widest">Filial</span>
+                  <div className="flex gap-2">
+                    <span className="bg-white/10 text-white px-3 py-1 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-widest">Filial</span>
+                    {pocosOpen ? (
+                      <span className="bg-[#39ff14]/20 text-[#39ff14] px-3 py-1 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-widest">🟢 Aberto</span>
+                    ) : (
+                      <span className="bg-red-500/20 text-red-500 px-3 py-1 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-widest">🔴 Fechado</span>
+                    )}
+                  </div>
                   <span className="text-zinc-500 text-[10px] sm:text-xs font-mono">CNPJ: 59.549.387/0001-82</span>
                 </div>
                 <h3 className="text-2xl sm:text-3xl font-black uppercase mb-6 text-white group-hover:text-[#39ff14] transition-colors">On Disk Poços de Caldas</h3>
@@ -279,12 +309,17 @@ function App() {
                     <span className="text-[#39ff14] text-lg">📱</span>
                     <span>(35) 99731-6217</span>
                   </p>
+                  <p className="text-zinc-500 text-xs flex items-center gap-3">
+                    <span className="text-zinc-600 text-lg">🕒</span>
+                    <span>Aberto todos os dias das 14:00 às 03:00</span>
+                  </p>
                 </div>
               </div>
-              <a href="tel:35997316217" className="w-full text-center bg-white/10 border border-white/20 text-white font-black px-4 py-4 rounded-xl text-xs sm:text-sm tracking-widest uppercase hover:bg-white/20 hover:border-white/40 transition-all">
-                Ligar para Poços
+              <a href="https://wa.me/5535997316217" target="_blank" rel="noreferrer" className="w-full text-center bg-[#39ff14] text-black font-black px-4 py-4 rounded-xl text-xs sm:text-sm tracking-widest uppercase hover:bg-white transition-all shadow-[0_0_20px_rgba(57,255,20,0.2)]">
+                Pedir no WhatsApp
               </a>
             </div>
+
           </div>
         </div>
       </section>
