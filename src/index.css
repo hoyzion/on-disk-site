@@ -5,15 +5,12 @@
 body {
   background-color: #020202;
   color: white;
-  /* Oculta a barra de rolagem horizontal para as faixas inclinadas não quebrarem o site */
   overflow-x: hidden; 
   font-family: 'Inter', sans-serif;
   min-height: 100vh; 
 }
 
-/* =========================================
-   FUNDO GLOBAL ANIMADO (MALHA NEON)
-   ========================================= */
+/* MALHA NEON FLUIDA DE FUNDO */
 .bg-grid-pattern {
   background-image: 
     linear-gradient(to right, rgba(57, 255, 20, 0.04) 1px, transparent 1px),
@@ -36,9 +33,7 @@ body {
   100% { transform: translateY(40px); }
 }
 
-/* =========================================
-   ANIMAÇÃO DE FLUTUAÇÃO (COPOS E IMAGENS)
-   ========================================= */
+/* ANIMAÇÃO DE FLUTUAÇÃO DOS COMBOS E ELEMENTOS */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-15px); }
@@ -48,9 +43,7 @@ body {
   animation: float 5s ease-in-out infinite;
 }
 
-/* =========================================
-   ANIMAÇÕES DAS FAIXAS ESTILO GR6
-   ========================================= */
+/* ANIMAÇÕES DAS FAIXAS URBANAS (LENTAS - 40 SEGUNDOS) */
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
@@ -58,7 +51,6 @@ body {
 
 .animate-marquee {
   width: max-content;
-  /* 40s deixa a leitura agradável. Se quiser mais rápido, diminua esse valor */
   animation: marquee 40s linear infinite; 
 }
 
@@ -72,9 +64,7 @@ body {
   animation: marquee-reverse 40s linear infinite;
 }
 
-/* =========================================
-   EFEITO DE VIDRO (CARDS DOS DRINKS)
-   ========================================= */
+/* GLASSMORPHISM REAL (VIDRO DO MENU) */
 .glass-effect {
   background: rgba(20, 20, 20, 0.4);
   backdrop-filter: blur(12px);
@@ -88,9 +78,7 @@ body {
   box-shadow: 0 0 20px rgba(57, 255, 20, 0.15);
 }
 
-/* =========================================
-   TEXTOS COM BRILHO NEON
-   ========================================= */
+/* TEXT SHADOW NEON BRILHANTE */
 .text-neon {
   text-shadow: 0 0 10px #39ff14, 0 0 20px rgba(57, 255, 20, 0.5);
 }
